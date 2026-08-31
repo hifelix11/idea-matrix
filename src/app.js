@@ -22,6 +22,7 @@
 
   let currentTab = "everyone";   // "everyone" or personId
   let mergedMode = "avg";        // "avg" | "all"
+  let editingIdeaId = null;      // idea loaded into the add form for editing
   let saveTimer = null;
   let dirty = false;             // local change not yet written to Firebase
   let dragging = false;          // a dot is mid-drag
@@ -51,7 +52,7 @@
   function userIsBusy(){
     const a = document.activeElement;
     return dragging || dirty ||
-           (a && (a.tagName === "INPUT" || a.isContentEditable));
+           (a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.isContentEditable));
   }
 
   function applyRemote(s){
@@ -306,6 +307,9 @@
     const sub  = document.getElementById("ideasSub");
     list.innerHTML = "";
 
+    if(editingIdeaId && !state.ideas.some(i=>i.id===editingIdeaId)) editingIdeaId = null;
+    document.getElementById("ideaAddBtn").textContent = editingIdeaId ? "Save" : "Add";
+
     if(currentTab==="everyone"){
       sub.textContent = "Pick a person's tab to place dots.";
     }else{
@@ -335,6 +339,7 @@
         <span class="swatch" style="background:${ideaColor(idea.id)}"></span>
         <span class="name" title="Double-click to edit">${esc(idea.name)}${idea.desc ? `<span class="desc">${esc(idea.desc)}</span>` : ""}</span>
         ${actionHtml}
+        <button class="idea-edit" title="Edit idea">✎</button>
         <button class="idea-del" title="Delete idea">✕</button>`;
 
       const act = row.querySelector(".idea-act");
@@ -346,21 +351,33 @@
           touched(); render();
         };
       }
-      row.querySelector(".name").ondblclick = ()=>{
-        const n = prompt("Rename idea:", idea.name);
-        if(n && n.trim()) idea.name = n.trim();
-        const d = prompt("Edit description:", idea.desc || "");
-        if(d !== null) idea.desc = d.trim();
-        touched(); render();
-      };
+      row.querySelector(".name").ondblclick = ()=> startEdit(idea);
+      row.querySelector(".idea-edit").onclick = ()=> startEdit(idea);
       row.querySelector(".idea-del").onclick = ()=>{
         if(!confirm(`Delete "${idea.name}" for everyone?`)) return;
         state.ideas = state.ideas.filter(i=>i.id!==idea.id);
         Object.values(state.placements).forEach(pl=>delete pl[idea.id]);
+        if(editingIdeaId===idea.id) editingIdeaId = null;
         touched(); render();
       };
       list.appendChild(row);
     });
+  }
+
+  function startEdit(idea){
+    editingIdeaId = idea.id;
+    document.getElementById("ideaInput").value = idea.name;
+    document.getElementById("ideaDescInput").value = idea.desc || "";
+    render();
+    document.getElementById("ideaInput").focus();
+  }
+
+  function cancelEdit(){
+    if(!editingIdeaId) return;
+    editingIdeaId = null;
+    document.getElementById("ideaInput").value = "";
+    document.getElementById("ideaDescInput").value = "";
+    render();
   }
 
   function addIdea(){
@@ -368,15 +385,29 @@
     const dinp = document.getElementById("ideaDescInput");
     const v = inp.value.trim();
     if(!v) return;
-    state.ideas.push({id:uid(), name:v, desc:dinp.value.trim()});
+    const editing = editingIdeaId && state.ideas.find(i=>i.id===editingIdeaId);
+    if(editing){
+      editing.name = v;
+      editing.desc = dinp.value.trim();
+    }else{
+      state.ideas.push({id:uid(), name:v, desc:dinp.value.trim()});
+    }
+    editingIdeaId = null;
     inp.value = "";
     dinp.value = "";
     touched(); render();
     inp.focus();
   }
   document.getElementById("ideaAddBtn").onclick = addIdea;
-  document.getElementById("ideaInput").addEventListener("keydown", e=>{ if(e.key==="Enter") addIdea(); });
-  document.getElementById("ideaDescInput").addEventListener("keydown", e=>{ if(e.key==="Enter") addIdea(); });
+  document.getElementById("ideaInput").addEventListener("keydown", e=>{
+    if(e.key==="Enter") addIdea();
+    if(e.key==="Escape") cancelEdit();
+  });
+  // Enter saves, Shift+Enter makes a new line
+  document.getElementById("ideaDescInput").addEventListener("keydown", e=>{
+    if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); addIdea(); }
+    if(e.key==="Escape") cancelEdit();
+  });
 
   /* ---------------- render ---------------- */
   function render(){

@@ -145,7 +145,7 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:16p
 .idea-row:hover{background:var(--cream);}
 .idea-row .swatch{width:16px;height:16px;border-radius:50%;flex:none;border:2px solid var(--paper);box-shadow:0 0 0 1.5px var(--line);}
 .idea-row .name{flex:1;font-weight:600;font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.idea-row .name .desc{display:block;font-size:12px;font-weight:500;color:#8a8f7d;overflow:hidden;text-overflow:ellipsis;}
+.idea-row .name .desc{display:block;font-size:12px;font-weight:500;color:#8a8f7d;white-space:pre-line;}
 .idea-row .stat{font-size:11px;font-weight:700;color:#9aa08c;flex:none;}
 .idea-act{
   width:30px;height:30px;flex:none;border-radius:50%;
@@ -157,17 +157,20 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:16p
 }
 .idea-act:hover{transform:scale(1.1);}
 .idea-act.placed{background:var(--lime);border-color:var(--lime);}
-.idea-del{opacity:0;font-size:14px;color:#9aa08c;padding:4px;flex:none;}
-.idea-row:hover .idea-del{opacity:.7;}
+.idea-del,.idea-edit{opacity:0;font-size:14px;color:#9aa08c;padding:4px;flex:none;}
+.idea-row:hover .idea-del,.idea-row:hover .idea-edit{opacity:.7;}
 .idea-del:hover{opacity:1 !important;color:#c0392b;}
+.idea-edit:hover{opacity:1 !important;color:var(--forest);}
 
 .idea-add{display:flex;gap:8px;margin-top:14px;}
 .idea-add-fields{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;}
-.idea-add input{
+.idea-add input,.idea-add textarea{
   flex:1;min-width:0;padding:11px 14px;border-radius:12px;
   border:1.5px solid var(--line);background:var(--cream);outline:none;font-size:14px;
+  font-family:inherit;color:inherit;
 }
-.idea-add input:focus{border-color:var(--forest);}
+.idea-add textarea{resize:none;}
+.idea-add input:focus,.idea-add textarea:focus{border-color:var(--forest);}
 .idea-add button{
   padding:11px 18px;border-radius:12px;background:var(--lime);
   color:var(--forest);font-weight:800;font-size:14px;
@@ -195,6 +198,9 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:16p
 
   /* Add button below the inputs */
   .idea-add{flex-direction:column;}
+
+  /* no hover on touch screens — keep row actions visible */
+  .idea-del,.idea-edit{opacity:.6;}
 
   /* axis labels sit on the matrix edges, breaking the border line */
   .matrix-wrap{padding:0;}
