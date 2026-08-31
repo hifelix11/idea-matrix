@@ -42,13 +42,13 @@ Database page if it's not in the snippet.)
 Commit, push, send the GitHub Pages link to your friends. Done.
 
 ## Notes
-- Without the Firebase config the app still works, but saves only in
-  your own browser — the badge in the header tells you which mode
-  you're in.
+- Without the Firebase config the app still works, but nothing is
+  saved — use Export JSON to keep a copy. The badge in the header
+  tells you which mode you're in.
 - Test-mode database rules expire after 30 days and allow anyone who
   knows the URL to read/write. Fine for three friends picking a
   startup; if you want it tighter later, set the rules to require a
   secret in the path or add Firebase Auth.
-- Export JSON / Import in the header still work as manual backup.
+- Export JSON in the header still works as manual backup.
 - `BOARD_ID` in `config/firebase-config.js` names the board — change it to start over
   with a clean slate without deleting anything.

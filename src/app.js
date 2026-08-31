@@ -6,16 +6,8 @@
   let state = {
     xLabel: "Hype — fun & interest →",
     yLabel: "Payoff — feasibility, money, market →",
-    people: [
-      {id:"p1", name:"Felix",  matrixName:"Felix's matrix"},
-      {id:"p2", name:"Niklas", matrixName:"Niklas's matrix"}
-    ],
-    ideas: [
-      {id:"i1", name:"Idea 1"},
-      {id:"i2", name:"Idea 2"},
-      {id:"i3", name:"Idea 3"},
-      {id:"i4", name:"Idea 4"}
-    ],
+    people: [],
+    ideas: [],
     placements: {} // personId -> ideaId -> {x,y} (0..1, y up)
   };
 
@@ -32,17 +24,8 @@
      The board is one JSON object (`state`).
        1. Firebase Realtime Database (if configured) — shared & live,
           this is the mode for the GitHub Pages link you send friends
-       2. localStorage — saved on this device only
-       3. neither — in-memory; use Export JSON to keep a copy
+       2. no config — in-memory only; use Export JSON to keep a copy
   ------------------------------------------------------------------ */
-  let hasLocal = false;
-  try{
-    const t = "__im_test__";
-    window.localStorage.setItem(t, "1");
-    window.localStorage.removeItem(t);
-    hasLocal = true;
-  }catch(e){ hasLocal = false; }
-
   const hasFirebase = !!(window.firebase && FIREBASE_CONFIG && FIREBASE_CONFIG.databaseURL);
 
   /* Firebase drops empty arrays/objects, so restore them on the way in. */
@@ -93,15 +76,6 @@
           pendingRemote = null;
         }
       }, 800);
-    }else if(hasLocal){
-      try{
-        const raw = window.localStorage.getItem("idea-matrix-v1");
-        if(raw){
-          const s = normalize(JSON.parse(raw));
-          if(s) state = s;
-        }
-      }catch(e){ /* corrupt or missing — keep defaults */ }
-      setSyncBadge(true);
     }else{
       setSyncBadge(false);
     }
@@ -117,10 +91,6 @@
           dirty = false;
           setSyncBadge(true);
         }catch(e){ setSyncBadge(false); }
-      }else if(hasLocal){
-        try{ window.localStorage.setItem("idea-matrix-v1", JSON.stringify(state)); }
-        catch(e){ console.error("save failed", e); }
-        dirty = false;
       }else{
         dirty = false;
       }
@@ -133,16 +103,13 @@
     if(hasFirebase){
       b.classList.toggle("on", !!ok);
       label.textContent = ok ? "live · shared with the team" : "connection lost — retrying";
-    }else if(hasLocal){
-      b.classList.add("on");
-      label.textContent = "saved on this device";
     }else{
-      label.textContent = "not saved";
+      label.textContent = "not saved — use Export JSON";
     }
   }
   function touched(){ scheduleSave(); }
 
-  /* ---------------- export / import JSON ---------------- */
+  /* ---------------- export JSON ---------------- */
   document.getElementById("exportBtn").onclick = ()=>{
     const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
     const a = document.createElement("a");
@@ -151,28 +118,6 @@
     a.click();
     URL.revokeObjectURL(a.href);
   };
-  document.getElementById("importBtn").onclick = ()=> document.getElementById("importFile").click();
-  document.getElementById("importFile").addEventListener("change", e=>{
-    const f = e.target.files[0];
-    if(!f) return;
-    const reader = new FileReader();
-    reader.onload = ()=>{
-      try{
-        const s = JSON.parse(reader.result);
-        const n = normalize(s);
-        if(!n) throw new Error("wrong shape");
-        if(!confirm("Replace the current board with the imported one?")) return;
-        state = n;
-        currentTab = "everyone";
-        placingIdea = null;
-        touched(); render();
-      }catch(err){
-        alert("That file isn't a valid Idea Matrix export.");
-      }
-    };
-    reader.readAsText(f);
-    e.target.value = "";
-  });
 
   /* ---------------- helpers ---------------- */
   const uid = () => Math.random().toString(36).slice(2,9);
