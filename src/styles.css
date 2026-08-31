@@ -31,9 +31,6 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
 }
 .brand p{margin-top:6px;font-size:14px;color:#5c6152;max-width:46ch;}
 .head-tools{display:flex;align-items:center;gap:10px;padding-bottom:4px;flex-wrap:wrap;}
-.sync{font-size:12px;color:#7a7f6e;display:flex;align-items:center;gap:7px;}
-.sync i{width:9px;height:9px;border-radius:50%;background:#b8bda9;display:inline-block;}
-.sync.on i{background:var(--forest);}
 .tool-btn{
   font-size:12px;font-weight:700;padding:7px 14px;border-radius:999px;
   background:var(--paper);border:1.5px solid var(--line);color:var(--forest);
@@ -89,7 +86,8 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
 }
 /* the matrix sits inside .matrix-wrap's 40px left/bottom padding,
    so shift the label anchors by half of that to center on the matrix */
-.axis-y{left:-4px;top:calc(50% - 20px);transform:rotate(-90deg) translateX(-50%);transform-origin:left center;}
+/* anchored at the middle of .matrix-wrap's 40px gutter */
+.axis-y{left:20px;top:calc(50% - 20px);transform:rotate(-90deg) translateX(-50%);transform-origin:left center;}
 .axis-x{bottom:0;left:calc(50% + 20px);transform:translateX(-50%);}
 
 .matrix{
@@ -182,7 +180,7 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
 /* ---------- mobile ---------- */
 @media (max-width:640px){
   .shell{padding:20px 20px 40px;}
-  .tabs{margin-bottom:18px;}
+  .tabs{margin-bottom:28px;}
 
   /* sections divided by full-width lines instead of bordered cards */
   .board{gap:0;}
@@ -192,8 +190,8 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
     border-top:1px solid var(--line);
     background:transparent;
   }
-  .matrix-panel{padding:18px 20px 30px;}
-  .ideas-panel{padding:18px 20px 22px;}
+  .matrix-panel{padding:28px 20px 44px;}
+  .ideas-panel{padding:28px 20px 30px;}
 
   /* axis labels sit on the matrix edges, breaking the border line */
   .matrix-wrap{padding:0;}

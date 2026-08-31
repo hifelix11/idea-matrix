@@ -69,13 +69,12 @@
         const s = normalize(snap.val());
         if(!s){
           // brand-new board: seed it with the defaults
-          if(snap.val() === null) boardRef.set(state).catch(()=>setSyncBadge(false));
+          if(snap.val() === null) boardRef.set(state).catch(()=>{});
           return;
         }
-        setSyncBadge(true);
         if(userIsBusy()){ pendingRemote = s; return; }
         applyRemote(s);
-      }, ()=> setSyncBadge(false));
+      });
       // apply a friend's update once you're idle again
       setInterval(()=>{
         if(pendingRemote && !userIsBusy()){
@@ -83,8 +82,6 @@
           pendingRemote = null;
         }
       }, 800);
-    }else{
-      setSyncBadge(false);
     }
   }
 
@@ -95,25 +92,14 @@
       if(boardRef){
         try{
           await boardRef.set(state);
-          dirty = false;
-          setSyncBadge(true);
-        }catch(e){ setSyncBadge(false); }
+        }catch(e){ console.error("save failed", e); }
+        dirty = false;
       }else{
         dirty = false;
       }
     }, 400);
   }
 
-  function setSyncBadge(ok){
-    const b = document.getElementById("syncBadge");
-    const label = b.querySelector("span");
-    if(hasFirebase){
-      b.classList.toggle("on", !!ok);
-      label.textContent = ok ? "live · shared with the team" : "connection lost — retrying";
-    }else{
-      label.textContent = "not saved — use Export JSON";
-    }
-  }
   function touched(){ scheduleSave(); }
 
   /* ---------------- export JSON ---------------- */
