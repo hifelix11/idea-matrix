@@ -10,7 +10,8 @@ shared state). Changes sync live to everyone with the link.
 ## Setup (once, ~5 minutes)
 
 ### 1. Put it on GitHub Pages
-1. Create a new GitHub repository and upload `index.html` (and this README).
+1. Create a new GitHub repository and upload `index.html`, the `src/`
+   and `config/` folders (and this README).
 2. In the repo: Settings -> Pages -> Source: "Deploy from a branch",
    branch `main`, folder `/ (root)`. Save.
 3. After a minute your app is live at
@@ -25,8 +26,8 @@ shared state). Changes sync live to everyone with the link.
    register it -> copy the `firebaseConfig` object it shows you.
 
 ### 3. Connect the two
-Open `index.html`, find `FIREBASE_CONFIG` near the top, and paste your
-values in, e.g.:
+Open `config/firebase-config.js`, find `FIREBASE_CONFIG`, and paste
+your values in, e.g.:
 
     const FIREBASE_CONFIG = {
       apiKey: "AIza....",
@@ -49,5 +50,5 @@ Commit, push, send the GitHub Pages link to your friends. Done.
   startup; if you want it tighter later, set the rules to require a
   secret in the path or add Firebase Auth.
 - Export JSON / Import in the header still work as manual backup.
-- `BOARD_ID` in index.html names the board — change it to start over
+- `BOARD_ID` in `config/firebase-config.js` names the board — change it to start over
   with a clean slate without deleting anything.
