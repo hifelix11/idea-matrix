@@ -21,10 +21,10 @@
   let boardRef = null;           // Firebase reference (null = local-only mode)
 
   /* ---------------- storage ----------------
-     The board is one JSON object (`state`).
-       1. Firebase Realtime Database (if configured) — shared & live,
-          this is the mode for the GitHub Pages link you send friends
-       2. no config — in-memory only; use Export JSON to keep a copy
+     The board is one JSON object (`state`), stored in the Firebase
+     Realtime Database — shared & live for everyone with the link.
+     Without a Firebase config it's in-memory only (Export JSON to
+     keep a copy).
   ------------------------------------------------------------------ */
   const hasFirebase = !!(window.firebase && FIREBASE_CONFIG && FIREBASE_CONFIG.databaseURL);
 
@@ -168,7 +168,7 @@
     add.onclick = ()=>{
       const n = prompt("Who's joining?");
       if(n && n.trim()){
-        const p = {id:uid(), name:n.trim(), matrixName:n.trim()+"'s matrix"};
+        const p = {id:uid(), name:n.trim()};
         state.people.push(p);
         currentTab = p.id;
         touched(); render();
@@ -189,15 +189,13 @@
 
     if(currentTab==="everyone"){
       title.textContent = "Everyone's matrix";
-      title.contentEditable = "false";
       toggle.style.display = "inline-flex";
       toggle.querySelectorAll("button").forEach(b=>b.classList.toggle("on", b.dataset.mode===mergedMode));
       hint.textContent = "";
       renderMergedDots(m);
     }else{
       const p = person(currentTab);
-      title.textContent = p.matrixName;
-      title.contentEditable = "true";
+      title.textContent = p.name + "'s matrix";
       toggle.style.display = "none";
       hint.textContent = "drag dots to move · drag out to remove";
       renderPersonDots(m, p);
@@ -324,7 +322,6 @@
       render();
     });
   }
-  bindEditable("matrixTitle", v=>{ if(currentTab!=="everyone") person(currentTab).matrixName = v; });
   bindEditable("axisX", v=> state.xLabel = v);
   bindEditable("axisY", v=> state.yLabel = v);
 

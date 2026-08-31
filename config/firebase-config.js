@@ -6,6 +6,7 @@
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyAk6iyM4KoM1vMOK3FDk9y4O49RWnNyJrk",
   authDomain: "idea-matrix.firebaseapp.com",
+  databaseURL: "https://idea-matrix-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "idea-matrix",
   storageBucket: "idea-matrix.firebasestorage.app",
   messagingSenderId: "449746782273",
