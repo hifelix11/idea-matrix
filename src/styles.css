@@ -95,6 +95,8 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
 .matrix{
   position:relative;width:100%;aspect-ratio:1/1;
   background:var(--cream);border:2px solid var(--ink);border-radius:16px;
+  background-image:radial-gradient(circle, rgba(31,36,21,.13) 1px, transparent 1.5px);
+  background-size:26px 26px;background-position:center;
   touch-action:none;overflow:hidden;
 }
 .matrix .grid-h,.matrix .grid-v{position:absolute;background:var(--ink);opacity:.25;}
@@ -187,15 +189,16 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
   .panel{
     border:none;border-radius:0;
     margin:0 -20px;
-    border-top:1px solid var(--ink);
+    border-top:1px solid var(--line);
+    background:transparent;
   }
   .matrix-panel{padding:18px 20px 30px;}
   .ideas-panel{padding:18px 20px 22px;}
 
   /* axis labels sit on the matrix edges, breaking the border line */
   .matrix-wrap{padding:0;}
-  .matrix{background:var(--paper);border-width:1px;border-radius:24px;}
-  .axis-y,.axis-x{background:var(--paper);z-index:2;font-size:12px;}
+  .matrix{border-width:1.5px;border-radius:24px;}
+  .axis-y,.axis-x{background:var(--cream);z-index:2;font-size:12px;}
   .axis-y{left:0;top:50%;}
   .axis-x{bottom:0;left:50%;transform:translate(-50%,50%);}
 

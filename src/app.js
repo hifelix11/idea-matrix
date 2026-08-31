@@ -207,7 +207,7 @@
   function renderAxis(id, label){
     const el = document.getElementById(id);
     const word = label.split("—")[0].replace("→","").trim();
-    el.innerHTML = `${esc(word)} →<span class="axis-info">i</span>`;
+    el.innerHTML = `${esc(word)}<span class="axis-info">i</span>`;
     el.onclick = ()=> alert(label);
   }
 
