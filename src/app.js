@@ -135,9 +135,9 @@
       label.textContent = ok ? "live · shared with the team" : "connection lost — retrying";
     }else if(hasLocal){
       b.classList.add("on");
-      label.textContent = "saved on this device · no sync yet (add Firebase config)";
+      label.textContent = "saved on this device";
     }else{
-      label.textContent = "not saved — use Export JSON";
+      label.textContent = "not saved";
     }
   }
   function touched(){ scheduleSave(); }
@@ -468,26 +468,12 @@
   }
   document.getElementById("cancelPlacing").onclick = ()=>{ placingIdea=null; render(); };
 
-  /* ---------------- legend ---------------- */
-  function renderLegend(){
-    const el = document.getElementById("legend");
-    el.innerHTML = '<span class="lg-title">HANDLES</span>';
-    state.ideas.forEach((idea, idx)=>{
-      const s = document.createElement("span");
-      s.className = "lg-item";
-      s.innerHTML = `<i style="background:${ideaColor(idea.id)}"></i>${idx+1}. ${esc(idea.name)}`;
-      el.appendChild(s);
-    });
-    if(!state.ideas.length) el.innerHTML += '<span class="lg-item" style="color:#9aa08c">nothing here yet</span>';
-  }
-
   /* ---------------- render ---------------- */
   function render(){
     renderTabs();
     renderMatrix();
     renderIdeas();
     renderBanner();
-    renderLegend();
   }
 
   loadState().then(render);

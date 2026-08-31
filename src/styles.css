@@ -85,8 +85,10 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
   color:var(--forest);cursor:text;border-radius:6px;padding:3px 8px;outline:none;
   white-space:nowrap;
 }
-.axis-y{left:-4px;top:50%;transform:rotate(-90deg) translateX(50%);transform-origin:left center;}
-.axis-x{bottom:0;left:50%;transform:translateX(-50%);}
+/* the matrix sits inside .matrix-wrap's 40px left/bottom padding,
+   so shift the label anchors by half of that to center on the matrix */
+.axis-y{left:-4px;top:calc(50% - 20px);transform:rotate(-90deg) translateX(50%);transform-origin:left center;}
+.axis-x{bottom:0;left:calc(50% + 20px);transform:translateX(-50%);}
 .axis-y:hover,.axis-x:hover,.axis-y:focus,.axis-x:focus{background:var(--lime);}
 
 .matrix{
@@ -179,12 +181,3 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
 .idea-add button:hover{transform:translateY(-1px);}
 
 .empty{font-size:14px;color:#9aa08c;padding:18px 4px;text-align:center;}
-
-/* ---------- legend ---------- */
-.legend{
-  margin-top:26px;padding:16px 22px;
-  display:flex;gap:10px 22px;flex-wrap:wrap;align-items:center;
-}
-.legend .lg-title{font-weight:800;font-size:13px;letter-spacing:.04em;color:var(--forest);margin-right:6px;}
-.legend .lg-item{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;}
-.legend .lg-item i{width:12px;height:12px;border-radius:50%;display:inline-block;}
