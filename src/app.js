@@ -240,7 +240,7 @@
         d.style.background = ideaColor(idea.id);
         d.textContent = abbrev(idea.name);
         d.innerHTML += `<span class="badge">${n}/${state.people.length}</span>
-                        <span class="dot-label">${esc(idea.name)} — average of ${n}</span>`;
+                        <span class="dot-label">${esc(idea.name)}${idea.desc ? " — " + esc(idea.desc) : ""}</span>`;
         posToStyle(d, {x:sx/n, y:sy/n});
         m.appendChild(d);
       });
