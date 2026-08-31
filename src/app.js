@@ -121,6 +121,7 @@
   const abbrev = name => name.trim().slice(0,3).toUpperCase();
   const getPl = pid => (state.placements[pid] = state.placements[pid] || {});
   const esc = s => s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const arrows = s => s.replace(/->/g, "→"); // typed "->" becomes a real arrow
 
   /* ---------------- tabs ---------------- */
   function renderTabs(){
@@ -152,7 +153,7 @@
       t.ondblclick = e=>{
         if(e.target.classList.contains("x")) return;
         const n = prompt("Rename person:", p.name);
-        if(n && n.trim()){ p.name = n.trim(); touched(); render(); }
+        if(n && n.trim()){ p.name = arrows(n.trim()); touched(); render(); }
       };
       el.appendChild(t);
     });
@@ -163,7 +164,7 @@
     add.onclick = ()=>{
       const n = prompt("Who's joining?");
       if(n && n.trim()){
-        const p = {id:uid(), name:n.trim()};
+        const p = {id:uid(), name:arrows(n.trim())};
         state.people.push(p);
         currentTab = p.id;
         touched(); render();
@@ -387,10 +388,10 @@
     if(!v) return;
     const editing = editingIdeaId && state.ideas.find(i=>i.id===editingIdeaId);
     if(editing){
-      editing.name = v;
-      editing.desc = dinp.value.trim();
+      editing.name = arrows(v);
+      editing.desc = arrows(dinp.value.trim());
     }else{
-      state.ideas.push({id:uid(), name:v, desc:dinp.value.trim()});
+      state.ideas.push({id:uid(), name:arrows(v), desc:arrows(dinp.value.trim())});
     }
     editingIdeaId = null;
     inp.value = "";
