@@ -190,8 +190,11 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:16p
     border-top:1px solid var(--line);
     background:transparent;
   }
-  .matrix-panel{padding:28px 20px 44px;}
+  .matrix-panel{padding:28px 20px 44px;border-top:none;}
   .ideas-panel{padding:28px 20px 30px;}
+
+  /* Add button below the inputs */
+  .idea-add{flex-direction:column;}
 
   /* axis labels sit on the matrix edges, breaking the border line */
   .matrix-wrap{padding:0;}
