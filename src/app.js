@@ -317,7 +317,7 @@
       return;
     }
 
-    state.ideas.forEach((idea, idx)=>{
+    state.ideas.forEach(idea=>{
       const row = document.createElement("div");
       row.className = "idea-row";
 
@@ -333,7 +333,7 @@
 
       row.innerHTML = `
         <span class="swatch" style="background:${ideaColor(idea.id)}"></span>
-        <span class="name" title="Double-click to edit">${idx+1}. ${esc(idea.name)}${idea.desc ? `<span class="desc">${esc(idea.desc)}</span>` : ""}</span>
+        <span class="name" title="Double-click to edit">${esc(idea.name)}${idea.desc ? `<span class="desc">${esc(idea.desc)}</span>` : ""}</span>
         ${actionHtml}
         <button class="idea-del" title="Delete idea">✕</button>`;
 
