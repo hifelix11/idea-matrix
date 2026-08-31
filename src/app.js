@@ -3,9 +3,18 @@
 
   const PALETTE = ["#7B61FF","#FF6B4A","#00A876","#E84C8B","#1F8FFF","#F5A800","#254F1A","#8A4FFF","#00B8C4","#C0392B"];
 
+  const AXES = {
+    x: {
+      word: "Hype",
+      info: "Hype — how exciting is this idea?\n\nHow much fun would it be to build, and how much does it genuinely interest you? Further right = more hype."
+    },
+    y: {
+      word: "Payoff",
+      info: "Payoff — how much could this idea realistically return?\n\nThink feasibility, effort, market size and money-making potential. Higher up = more payoff."
+    }
+  };
+
   let state = {
-    xLabel: "Hype — fun & interest →",
-    yLabel: "Payoff — feasibility, money, market →",
     people: [],
     ideas: [],
     placements: {} // personId -> ideaId -> {x,y} (0..1, y up)
@@ -33,8 +42,8 @@
     s.people = Array.isArray(s.people) ? s.people : [];
     s.ideas = Array.isArray(s.ideas) ? s.ideas : [];
     s.placements = (s.placements && typeof s.placements === "object") ? s.placements : {};
-    s.xLabel = s.xLabel || "Hype →";
-    s.yLabel = s.yLabel || "Payoff →";
+    delete s.xLabel;
+    delete s.yLabel;
     return s;
   }
   function validState(s){ return !!normalize(s); }
@@ -199,16 +208,15 @@
       renderPersonDots(m, p);
     }
 
-    renderAxis("axisX", state.xLabel);
-    renderAxis("axisY", state.yLabel);
+    renderAxis("axisX", AXES.x);
+    renderAxis("axisY", AXES.y);
   }
 
   /* show only the axis word; the full description opens on click */
-  function renderAxis(id, label){
+  function renderAxis(id, axis){
     const el = document.getElementById(id);
-    const word = label.split("—")[0].replace("→","").trim();
-    el.innerHTML = `${esc(word)}<span class="axis-info">i</span>`;
-    el.onclick = ()=> alert(label);
+    el.innerHTML = `${esc(axis.word)}<span class="axis-info">i</span>`;
+    el.onclick = ()=> alert(axis.info);
   }
 
   function posToStyle(dot, pos){
