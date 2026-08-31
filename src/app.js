@@ -219,7 +219,7 @@
       d.className = "dot";
       d.style.background = ideaColor(idea.id);
       d.textContent = state.ideas.indexOf(idea)+1;
-      d.innerHTML += `<span class="dot-label">${esc(idea.name)}</span>`;
+      d.innerHTML += `<span class="dot-label">${esc(idea.name)}${idea.desc ? " — " + esc(idea.desc) : ""}</span>`;
       posToStyle(d, pos);
       enableDrag(d, m, p.id, idea.id);
       m.appendChild(d);
@@ -359,7 +359,7 @@
 
       row.innerHTML = `
         <span class="swatch" style="background:${ideaColor(idea.id)}"></span>
-        <span class="name" title="Double-click to rename">${idx+1}. ${esc(idea.name)}</span>
+        <span class="name" title="Double-click to edit">${idx+1}. ${esc(idea.name)}${idea.desc ? `<span class="desc">${esc(idea.desc)}</span>` : ""}</span>
         ${actionHtml}
         <button class="idea-del" title="Delete idea">✕</button>`;
 
@@ -372,7 +372,10 @@
       }
       row.querySelector(".name").ondblclick = ()=>{
         const n = prompt("Rename idea:", idea.name);
-        if(n && n.trim()){ idea.name = n.trim(); touched(); render(); }
+        if(n && n.trim()) idea.name = n.trim();
+        const d = prompt("Edit description:", idea.desc || "");
+        if(d !== null) idea.desc = d.trim();
+        touched(); render();
       };
       row.querySelector(".idea-del").onclick = ()=>{
         if(!confirm(`Delete "${idea.name}" for everyone?`)) return;
@@ -387,15 +390,18 @@
 
   function addIdea(){
     const inp = document.getElementById("ideaInput");
+    const dinp = document.getElementById("ideaDescInput");
     const v = inp.value.trim();
     if(!v) return;
-    state.ideas.push({id:uid(), name:v});
+    state.ideas.push({id:uid(), name:v, desc:dinp.value.trim()});
     inp.value = "";
+    dinp.value = "";
     touched(); render();
     inp.focus();
   }
   document.getElementById("ideaAddBtn").onclick = addIdea;
   document.getElementById("ideaInput").addEventListener("keydown", e=>{ if(e.key==="Enter") addIdea(); });
+  document.getElementById("ideaDescInput").addEventListener("keydown", e=>{ if(e.key==="Enter") addIdea(); });
 
   /* ---------------- placing banner ---------------- */
   function renderBanner(){

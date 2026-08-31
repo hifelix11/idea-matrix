@@ -71,7 +71,7 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
 }
 .matrix-hint{font-size:13px;color:#8a8f7d;}
 
-.view-toggle{display:inline-flex;background:var(--cream);border-radius:999px;padding:4px;gap:2px;}
+.view-toggle{display:inline-flex;background:var(--cream);border-radius:999px;padding:4px;gap:2px;margin-left:auto;}
 .view-toggle button{padding:7px 16px;border-radius:999px;font-size:13px;font-weight:700;color:#6d7261;}
 .view-toggle button.on{background:var(--ink);color:var(--lime);}
 
@@ -83,7 +83,7 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
 }
 /* the matrix sits inside .matrix-wrap's 40px left/bottom padding,
    so shift the label anchors by half of that to center on the matrix */
-.axis-y{left:-4px;top:calc(50% - 20px);transform:rotate(-90deg) translateX(50%);transform-origin:left center;}
+.axis-y{left:-4px;top:calc(50% - 20px);transform:rotate(-90deg) translateX(-50%);transform-origin:left center;}
 .axis-x{bottom:0;left:calc(50% + 20px);transform:translateX(-50%);}
 .axis-y:hover,.axis-x:hover,.axis-y:focus,.axis-x:focus{background:var(--lime);}
 
@@ -147,6 +147,7 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
 .idea-row:hover{background:var(--cream);}
 .idea-row .swatch{width:16px;height:16px;border-radius:50%;flex:none;border:2px solid var(--paper);box-shadow:0 0 0 1.5px var(--line);}
 .idea-row .name{flex:1;font-weight:600;font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.idea-row .name .desc{display:block;font-size:12px;font-weight:500;color:#8a8f7d;overflow:hidden;text-overflow:ellipsis;}
 .idea-row .stat{font-size:11px;font-weight:700;color:#9aa08c;flex:none;}
 .idea-act{
   width:30px;height:30px;flex:none;border-radius:50%;
@@ -164,6 +165,7 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
 .idea-del:hover{opacity:1 !important;color:#c0392b;}
 
 .idea-add{display:flex;gap:8px;margin-top:14px;}
+.idea-add-fields{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;}
 .idea-add input{
   flex:1;min-width:0;padding:11px 14px;border-radius:12px;
   border:1.5px solid var(--line);background:var(--cream);outline:none;font-size:14px;
