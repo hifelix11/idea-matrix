@@ -13,3 +13,8 @@ const FIREBASE_CONFIG = {
   appId: "1:449746782273:web:914b63a1f5e833ae8e5ec0"
 };
 const BOARD_ID = "main"; // change this to start a fresh board
+
+/* Model used for the AI feasibility check (via OpenRouter).
+   The API key is NOT stored here — the app asks for it once and
+   keeps it in your browser only. Never commit an API key. */
+const OPENROUTER_MODEL = "moonshotai/kimi-k3:online";

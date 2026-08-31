@@ -157,10 +157,11 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:16p
 }
 .idea-act:hover{transform:scale(1.1);}
 .idea-act.placed{background:var(--lime);border-color:var(--lime);}
-.idea-del,.idea-edit{opacity:0;font-size:14px;color:#9aa08c;padding:4px;flex:none;}
-.idea-row:hover .idea-del,.idea-row:hover .idea-edit{opacity:.7;}
+.idea-del,.idea-edit,.idea-feas{opacity:0;font-size:14px;color:#9aa08c;padding:4px;flex:none;}
+.idea-row:hover .idea-del,.idea-row:hover .idea-edit,.idea-row:hover .idea-feas{opacity:.7;}
 .idea-del:hover{opacity:1 !important;color:#c0392b;}
-.idea-edit:hover{opacity:1 !important;color:var(--forest);}
+.idea-edit:hover,.idea-feas:hover{opacity:1 !important;color:var(--forest);}
+.idea-feas.done{opacity:.8;color:var(--forest);}
 
 .idea-add{display:flex;gap:8px;margin-top:14px;}
 .idea-add-fields{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;}
@@ -179,6 +180,25 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:16p
 .idea-add button:hover{transform:translateY(-1px);}
 
 .empty{font-size:14px;color:#9aa08c;padding:18px 4px;text-align:center;}
+
+/* ---------- feasibility modal ---------- */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(31,36,21,.45);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;z-index:100;
+}
+.modal-overlay[hidden]{display:none;}
+.modal{
+  background:var(--paper);border:1.5px solid var(--line);border-radius:var(--radius);
+  max-width:640px;width:100%;max-height:82vh;
+  display:flex;flex-direction:column;
+}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px 22px 10px;}
+.modal-head h3{font-size:18px;font-weight:800;color:var(--forest);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.modal-close{font-size:16px;color:#9aa08c;padding:4px;flex:none;}
+.modal-close:hover{color:var(--ink);}
+.modal-body{padding:0 22px;overflow-y:auto;white-space:pre-wrap;font-size:14px;line-height:1.55;}
+.modal-foot{padding:14px 22px 18px;display:flex;justify-content:flex-end;}
 
 /* ---------- mobile ---------- */
 @media (max-width:640px){
@@ -200,7 +220,7 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:16p
   .idea-add{flex-direction:column;}
 
   /* no hover on touch screens — keep row actions visible */
-  .idea-del,.idea-edit{opacity:.6;}
+  .idea-del,.idea-edit,.idea-feas{opacity:.6;}
 
   /* axis labels sit on the matrix edges, breaking the border line */
   .matrix-wrap{padding:0;}

@@ -322,11 +322,21 @@
       return;
     }
 
-    state.ideas.forEach(idea=>{
+    /* order: not on this matrix -> placed, not fully rated -> fully rated, then A-Z */
+    const pl = currentTab==="everyone" ? null : getPl(currentTab);
+    const rated = idea => state.people.filter(p=>(state.placements[p.id]||{})[idea.id]).length;
+    const fullyRated = idea => state.people.length>0 && rated(idea)===state.people.length ? 1 : 0;
+    const sorted = state.ideas.slice().sort((a,b)=>{
+      if(pl && !!pl[a.id] !== !!pl[b.id]) return pl[a.id] ? 1 : -1;
+      if(fullyRated(a) !== fullyRated(b)) return fullyRated(a) - fullyRated(b);
+      return a.name.localeCompare(b.name);
+    });
+
+    sorted.forEach(idea=>{
       const row = document.createElement("div");
       row.className = "idea-row";
 
-      const placedBy = state.people.filter(p=>(state.placements[p.id]||{})[idea.id]).length;
+      const placedBy = rated(idea);
 
       let actionHtml;
       if(currentTab==="everyone"){
@@ -340,6 +350,7 @@
         <span class="swatch" style="background:${ideaColor(idea.id)}"></span>
         <span class="name" title="Double-click to edit">${esc(idea.name)}${idea.desc ? `<span class="desc">${esc(idea.desc)}</span>` : ""}</span>
         ${actionHtml}
+        <button class="idea-feas ${idea.feasibility?'done':''}" title="${idea.feasibility?'Show feasibility check':'Run AI feasibility check'}">📈</button>
         <button class="idea-edit" title="Edit idea">✎</button>
         <button class="idea-del" title="Delete idea">✕</button>`;
 
@@ -354,6 +365,10 @@
       }
       row.querySelector(".name").ondblclick = ()=> startEdit(idea);
       row.querySelector(".idea-edit").onclick = ()=> startEdit(idea);
+      row.querySelector(".idea-feas").onclick = ()=>{
+        if(idea.feasibility){ feasIdeaId = idea.id; openFeasModal(idea); }
+        else if(confirm(`Run an AI feasibility check for "${idea.name}"? This uses your OpenRouter credits.`)) runFeasibility(idea);
+      };
       row.querySelector(".idea-del").onclick = ()=>{
         if(!confirm(`Delete "${idea.name}" for everyone?`)) return;
         state.ideas = state.ideas.filter(i=>i.id!==idea.id);
@@ -409,6 +424,101 @@
     if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); addIdea(); }
     if(e.key==="Escape") cancelEdit();
   });
+
+  /* ---------------- feasibility check (OpenRouter) ----------------
+     The API key is asked for once and kept in this browser only —
+     it is never written to the shared board or the repo.          */
+  let feasIdeaId = null; // idea currently shown in the modal
+
+  function getOpenRouterKey(){
+    let k = null;
+    try{ k = window.localStorage.getItem("openrouter-key"); }catch(e){}
+    if(!k){
+      k = prompt("Paste your OpenRouter API key (sk-or-…).\nIt is stored only in this browser.");
+      if(!k || !k.trim()) return null;
+      k = k.trim();
+      try{ window.localStorage.setItem("openrouter-key", k); }catch(e){}
+    }
+    return k;
+  }
+
+  function openFeasModal(idea, status){
+    document.getElementById("feasTitle").textContent = idea.name;
+    const body = document.getElementById("feasBody");
+    if(status){
+      body.textContent = status;
+    }else if(idea.feasibility){
+      body.textContent = idea.feasibility.text +
+        "\n\n— checked " + new Date(idea.feasibility.ts).toLocaleDateString();
+    }else{
+      body.textContent = "No check yet.";
+    }
+    document.getElementById("feasModal").hidden = false;
+  }
+  function closeFeasModal(){
+    document.getElementById("feasModal").hidden = true;
+    feasIdeaId = null;
+  }
+  document.getElementById("feasClose").onclick = closeFeasModal;
+  document.getElementById("feasModal").addEventListener("click", e=>{
+    if(e.target.id === "feasModal") closeFeasModal();
+  });
+  document.getElementById("feasRerun").onclick = ()=>{
+    const idea = state.ideas.find(i=>i.id===feasIdeaId);
+    if(idea && confirm("Run a new feasibility check? This uses your OpenRouter credits.")) runFeasibility(idea);
+  };
+
+  async function runFeasibility(idea){
+    const key = getOpenRouterKey();
+    if(!key) return;
+    feasIdeaId = idea.id;
+    openFeasModal(idea, "Researching with web search — this can take a minute…");
+
+    const promptText =
+`You are a pragmatic startup analyst. Do a quick feasibility check on this idea:
+
+Idea: ${idea.name}
+${idea.desc ? "Description: " + idea.desc : ""}
+
+Use web search to ground your answer in real, current data. Reply in plain text (no markdown syntax) with exactly these sections:
+
+MARKET SIZE
+TAM, SAM and SOM with rough numbers and one line of reasoning each.
+
+SIMILAR COMPANIES
+5-8 companies or products that already do something similar: name — what they do — how this idea could differ.
+
+VERDICT
+2-3 sentences on overall feasibility and the single biggest risk.`;
+
+    try{
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + key, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: (typeof OPENROUTER_MODEL !== "undefined" && OPENROUTER_MODEL) || "moonshotai/kimi-k3:online",
+          messages: [{ role: "user", content: promptText }]
+        })
+      });
+      if(res.status === 401){
+        try{ window.localStorage.removeItem("openrouter-key"); }catch(e){}
+        throw new Error("invalid API key — it was cleared, click 📈 to enter it again");
+      }
+      if(!res.ok) throw new Error("OpenRouter answered " + res.status);
+      const data = await res.json();
+      const text = data.choices?.[0]?.message?.content;
+      if(!text) throw new Error("empty response");
+
+      const target = state.ideas.find(i=>i.id===idea.id);
+      if(target){
+        target.feasibility = { text: text.trim(), ts: Date.now() };
+        touched(); render();
+        if(feasIdeaId === idea.id) openFeasModal(target);
+      }
+    }catch(err){
+      if(feasIdeaId === idea.id) openFeasModal(idea, "Check failed: " + err.message);
+    }
+  }
 
   /* ---------------- render ---------------- */
   function render(){
