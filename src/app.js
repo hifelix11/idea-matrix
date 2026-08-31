@@ -118,7 +118,7 @@
   const person = id => state.people.find(p=>p.id===id);
   const ideaColor = id => PALETTE[ Math.max(0, state.ideas.findIndex(i=>i.id===id)) % PALETTE.length ];
   const initials = name => name.trim().split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase();
-  const abbrev = name => name.trim().slice(0,3).toUpperCase();
+  const abbrev = name => name.trim().split(/\s+/).slice(0,3).map(w=>w[0]).join("").toUpperCase();
   const getPl = pid => (state.placements[pid] = state.placements[pid] || {});
   const esc = s => s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const arrows = s => s.replace(/->/g, "→"); // typed "->" becomes a real arrow
