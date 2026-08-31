@@ -22,7 +22,7 @@ input{font:inherit;color:inherit;}
 .shell{max-width:1180px;margin:0 auto;padding:28px 24px 80px;}
 
 /* ---------- header ---------- */
-header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px;}
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px;}
 .brand h1{
   font-weight:900;font-stretch:110%;
   font-size:clamp(28px,4vw,44px);
@@ -30,7 +30,7 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
   color:var(--forest);
 }
 .brand p{margin-top:6px;font-size:14px;color:#5c6152;max-width:46ch;}
-.head-tools{display:flex;align-items:center;gap:10px;padding-bottom:4px;flex-wrap:wrap;}
+.head-tools{display:flex;align-items:center;gap:10px;flex:none;padding-top:6px;}
 .tool-btn{
   font-size:12px;font-weight:700;padding:7px 14px;border-radius:999px;
   background:var(--paper);border:1.5px solid var(--line);color:var(--forest);
