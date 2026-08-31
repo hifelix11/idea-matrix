@@ -13,7 +13,6 @@
 
   let currentTab = "everyone";   // "everyone" or personId
   let mergedMode = "avg";        // "avg" | "all"
-  let placingIdea = null;        // ideaId being placed via click
   let saveTimer = null;
   let dirty = false;             // local change not yet written to Firebase
   let dragging = false;          // a dot is mid-drag
@@ -42,7 +41,7 @@
 
   function userIsBusy(){
     const a = document.activeElement;
-    return dragging || dirty || !!placingIdea ||
+    return dragging || dirty ||
            (a && (a.tagName === "INPUT" || a.isContentEditable));
   }
 
@@ -50,7 +49,6 @@
     if(JSON.stringify(s) === JSON.stringify(state)) return;
     state = s;
     if(currentTab !== "everyone" && !person(currentTab)) currentTab = "everyone";
-    if(placingIdea && !state.ideas.some(i=>i.id===placingIdea)) placingIdea = null;
     render();
   }
 
@@ -124,6 +122,7 @@
   const person = id => state.people.find(p=>p.id===id);
   const ideaColor = id => PALETTE[ Math.max(0, state.ideas.findIndex(i=>i.id===id)) % PALETTE.length ];
   const initials = name => name.trim().split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase();
+  const abbrev = name => name.trim().slice(0,3).toUpperCase();
   const getPl = pid => (state.placements[pid] = state.placements[pid] || {});
   const esc = s => s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
@@ -135,7 +134,7 @@
     const all = document.createElement("button");
     all.className = "tab everyone" + (currentTab==="everyone" ? " active" : "");
     all.textContent = "Everyone";
-    all.onclick = ()=>{ currentTab="everyone"; placingIdea=null; render(); };
+    all.onclick = ()=>{ currentTab="everyone"; render(); };
     el.appendChild(all);
 
     state.people.forEach(p=>{
@@ -152,7 +151,7 @@
           }
           return;
         }
-        currentTab = p.id; placingIdea = null; render();
+        currentTab = p.id; render();
       };
       t.ondblclick = e=>{
         if(e.target.classList.contains("x")) return;
@@ -181,7 +180,6 @@
   function renderMatrix(){
     const m = document.getElementById("matrix");
     m.querySelectorAll(".dot").forEach(d=>d.remove());
-    m.classList.toggle("placing", !!placingIdea);
 
     const title = document.getElementById("matrixTitle");
     const hint = document.getElementById("matrixHint");
@@ -218,7 +216,7 @@
       const d = document.createElement("div");
       d.className = "dot";
       d.style.background = ideaColor(idea.id);
-      d.textContent = state.ideas.indexOf(idea)+1;
+      d.textContent = abbrev(idea.name);
       d.innerHTML += `<span class="dot-label">${esc(idea.name)}${idea.desc ? " — " + esc(idea.desc) : ""}</span>`;
       posToStyle(d, pos);
       enableDrag(d, m, p.id, idea.id);
@@ -238,7 +236,7 @@
         const d = document.createElement("div");
         d.className = "dot avg";
         d.style.background = ideaColor(idea.id);
-        d.textContent = state.ideas.indexOf(idea)+1;
+        d.textContent = abbrev(idea.name);
         d.innerHTML += `<span class="badge">${n}/${state.people.length}</span>
                         <span class="dot-label">${esc(idea.name)} — average of ${n}</span>`;
         posToStyle(d, {x:sx/n, y:sy/n});
@@ -261,18 +259,6 @@
       });
     }
   }
-
-  /* click-to-place */
-  document.getElementById("matrix").addEventListener("pointerdown", e=>{
-    if(!placingIdea || currentTab==="everyone") return;
-    if(e.target.closest(".dot")) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    const x = Math.min(1, Math.max(0, (e.clientX - r.left)/r.width));
-    const y = Math.min(1, Math.max(0, 1 - (e.clientY - r.top)/r.height));
-    getPl(currentTab)[placingIdea] = {x, y};
-    placingIdea = null;
-    touched(); render();
-  });
 
   /* drag */
   function enableDrag(dot, m, pid, iid){
@@ -334,7 +320,7 @@
     if(currentTab==="everyone"){
       sub.textContent = "Pick a person's tab to place dots.";
     }else{
-      sub.textContent = "Tap + then tap the matrix to drop a dot.";
+      sub.textContent = "Tap + to drop a dot in the middle, then drag it.";
     }
 
     if(!state.ideas.length){
@@ -353,8 +339,7 @@
         actionHtml = `<span class="stat">${placedBy}/${state.people.length} rated</span>`;
       }else{
         const placed = !!(getPl(currentTab)[idea.id]);
-        const sel = placingIdea===idea.id;
-        actionHtml = `<button class="idea-act ${placed?'placed':''} ${sel?'selected':''}" title="${placed?'Placed — click to re-place':'Place on matrix'}">${placed?'✓':'+'}</button>`;
+        actionHtml = `<button class="idea-act ${placed?'placed':''}" title="${placed?'Remove from matrix':'Place in the middle of the matrix'}">${placed?'✓':'+'}</button>`;
       }
 
       row.innerHTML = `
@@ -366,8 +351,10 @@
       const act = row.querySelector(".idea-act");
       if(act){
         act.onclick = ()=>{
-          placingIdea = (placingIdea===idea.id) ? null : idea.id;
-          render();
+          const pl = getPl(currentTab);
+          if(pl[idea.id]) delete pl[idea.id];
+          else pl[idea.id] = {x:0.5, y:0.5};
+          touched(); render();
         };
       }
       row.querySelector(".name").ondblclick = ()=>{
@@ -381,7 +368,6 @@
         if(!confirm(`Delete "${idea.name}" for everyone?`)) return;
         state.ideas = state.ideas.filter(i=>i.id!==idea.id);
         Object.values(state.placements).forEach(pl=>delete pl[idea.id]);
-        if(placingIdea===idea.id) placingIdea = null;
         touched(); render();
       };
       list.appendChild(row);
@@ -403,25 +389,11 @@
   document.getElementById("ideaInput").addEventListener("keydown", e=>{ if(e.key==="Enter") addIdea(); });
   document.getElementById("ideaDescInput").addEventListener("keydown", e=>{ if(e.key==="Enter") addIdea(); });
 
-  /* ---------------- placing banner ---------------- */
-  function renderBanner(){
-    const b = document.getElementById("placingBanner");
-    if(placingIdea && currentTab!=="everyone"){
-      const idea = state.ideas.find(i=>i.id===placingIdea);
-      document.getElementById("placingText").textContent = `Placing "${idea.name}" — tap anywhere on the matrix`;
-      b.style.display = "flex";
-    }else{
-      b.style.display = "none";
-    }
-  }
-  document.getElementById("cancelPlacing").onclick = ()=>{ placingIdea=null; render(); };
-
   /* ---------------- render ---------------- */
   function render(){
     renderTabs();
     renderMatrix();
     renderIdeas();
-    renderBanner();
   }
 
   loadState().then(render);

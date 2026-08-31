@@ -92,7 +92,6 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
   background:var(--cream);border:2px solid var(--ink);border-radius:16px;
   touch-action:none;overflow:hidden;
 }
-.matrix.placing{cursor:crosshair;outline:3px solid var(--lime);outline-offset:3px;}
 .matrix .grid-h,.matrix .grid-v{position:absolute;background:var(--ink);opacity:.25;}
 .matrix .grid-h{left:0;right:0;top:50%;height:1.5px;}
 .matrix .grid-v{top:0;bottom:0;left:50%;width:1.5px;}
@@ -128,12 +127,6 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
 }
 .dot:hover .dot-label{opacity:1;}
 
-.placing-banner{
-  margin-top:14px;background:var(--lime);border-radius:12px;
-  padding:10px 16px;font-size:14px;font-weight:700;color:var(--forest);
-  display:flex;justify-content:space-between;align-items:center;gap:10px;
-}
-.placing-banner button{font-size:13px;text-decoration:underline;font-weight:700;}
 
 /* ---------- idea list ---------- */
 .ideas-panel{padding:20px 20px 22px;}
@@ -159,7 +152,6 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
 }
 .idea-act:hover{transform:scale(1.1);}
 .idea-act.placed{background:var(--lime);border-color:var(--lime);}
-.idea-act.selected{background:var(--forest);color:var(--lime);border-color:var(--forest);}
 .idea-del{opacity:0;font-size:14px;color:#9aa08c;padding:4px;flex:none;}
 .idea-row:hover .idea-del{opacity:.7;}
 .idea-del:hover{opacity:1 !important;color:#c0392b;}
