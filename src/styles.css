@@ -64,7 +64,8 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
 
 /* ---------- matrix panel ---------- */
 .matrix-panel{padding:22px 24px 26px;}
-.matrix-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+/* padding-left matches .matrix-wrap's gutter so the row aligns with the matrix */
+.matrix-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding-left:40px;}
 .matrix-title{
   font-weight:800;font-size:22px;letter-spacing:-0.01em;color:var(--forest);
   padding:2px 2px;min-width:60px;
@@ -198,6 +199,6 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
   .axis-y{left:0;top:50%;}
   .axis-x{bottom:0;left:50%;transform:translate(-50%,50%);}
 
-  .matrix-head{margin-bottom:12px;}
+  .matrix-head{margin-bottom:12px;padding-left:0;}
   .view-toggle button{padding:5px 12px;font-size:12px;}
 }
