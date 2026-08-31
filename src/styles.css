@@ -42,7 +42,7 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
 .tool-btn:hover{transform:translateY(-1px);border-color:var(--forest);}
 
 /* ---------- tabs ---------- */
-.tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px;}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:26px;}
 .tab{
   padding:10px 20px;border-radius:999px;
   background:var(--paper);border:1.5px solid var(--line);
@@ -78,14 +78,18 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
 .matrix-wrap{position:relative;padding:0 0 40px 40px;}
 .axis-y,.axis-x{
   position:absolute;font-weight:800;font-size:13px;letter-spacing:.03em;
-  color:var(--forest);cursor:text;border-radius:6px;padding:3px 8px;outline:none;
+  color:var(--forest);cursor:pointer;border-radius:6px;padding:3px 8px;
   white-space:nowrap;
+}
+.axis-info{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:15px;height:15px;border-radius:50%;border:1.5px solid currentColor;
+  font-size:10px;font-weight:800;margin-left:4px;font-style:normal;
 }
 /* the matrix sits inside .matrix-wrap's 40px left/bottom padding,
    so shift the label anchors by half of that to center on the matrix */
 .axis-y{left:-4px;top:calc(50% - 20px);transform:rotate(-90deg) translateX(-50%);transform-origin:left center;}
 .axis-x{bottom:0;left:calc(50% + 20px);transform:translateX(-50%);}
-.axis-y:hover,.axis-x:hover,.axis-y:focus,.axis-x:focus{background:var(--lime);}
 
 .matrix{
   position:relative;width:100%;aspect-ratio:1/1;
@@ -171,3 +175,29 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
 .idea-add button:hover{transform:translateY(-1px);}
 
 .empty{font-size:14px;color:#9aa08c;padding:18px 4px;text-align:center;}
+
+/* ---------- mobile ---------- */
+@media (max-width:640px){
+  .shell{padding:20px 20px 40px;}
+  .tabs{margin-bottom:18px;}
+
+  /* sections divided by full-width lines instead of bordered cards */
+  .board{gap:0;}
+  .panel{
+    border:none;border-radius:0;
+    margin:0 -20px;
+    border-top:1px solid var(--ink);
+  }
+  .matrix-panel{padding:18px 20px 30px;}
+  .ideas-panel{padding:18px 20px 22px;}
+
+  /* axis labels sit on the matrix edges, breaking the border line */
+  .matrix-wrap{padding:0;}
+  .matrix{background:var(--paper);border-width:1px;border-radius:24px;}
+  .axis-y,.axis-x{background:var(--paper);z-index:2;font-size:12px;}
+  .axis-y{left:0;top:50%;}
+  .axis-x{bottom:0;left:50%;transform:translate(-50%,50%);}
+
+  .matrix-head{margin-bottom:12px;}
+  .view-toggle button{padding:5px 12px;font-size:12px;}
+}

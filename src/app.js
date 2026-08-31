@@ -199,8 +199,16 @@
       renderPersonDots(m, p);
     }
 
-    document.getElementById("axisX").textContent = state.xLabel;
-    document.getElementById("axisY").textContent = state.yLabel;
+    renderAxis("axisX", state.xLabel);
+    renderAxis("axisY", state.yLabel);
+  }
+
+  /* show only the axis word; the full description opens on click */
+  function renderAxis(id, label){
+    const el = document.getElementById(id);
+    const word = label.split("—")[0].replace("→","").trim();
+    el.innerHTML = `${esc(word)} →<span class="axis-info">i</span>`;
+    el.onclick = ()=> alert(label);
   }
 
   function posToStyle(dot, pos){
@@ -297,19 +305,6 @@
     const b = e.target.closest("button"); if(!b) return;
     mergedMode = b.dataset.mode; render();
   });
-
-  /* editable titles / axes */
-  function bindEditable(id, apply){
-    const el = document.getElementById(id);
-    el.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); el.blur(); } });
-    el.addEventListener("blur", ()=>{
-      const v = el.textContent.trim();
-      if(v){ apply(v); touched(); }
-      render();
-    });
-  }
-  bindEditable("axisX", v=> state.xLabel = v);
-  bindEditable("axisY", v=> state.yLabel = v);
 
   /* ---------------- idea list ---------------- */
   function renderIdeas(){
