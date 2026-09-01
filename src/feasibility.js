@@ -89,12 +89,13 @@ async function runCheck(idea){
      connection stalls — so a dead request never hangs forever */
   const started = Date.now();
   let streamedText = "";
+  let phase = "Searching the web";
   let lastData = Date.now();
   const ctrl = new AbortController();
   const ticker = setInterval(()=>{
     const secs = Math.round((Date.now() - started) / 1000);
     if(!streamedText && feasIdeaId === idea.id){
-      setBody("<p>Researching with web search — " + secs + "s…<br>(the search itself can take 1-2 minutes)</p>");
+      setBody("<p>" + phase + " — " + secs + "s…<br>(a full check takes 1-3 minutes)</p>");
     }
     if(Date.now() - lastData > 90000) ctrl.abort();
   }, 1000);
@@ -124,8 +125,7 @@ TAM, SAM and SOM as bullets with rough numbers, one line of reasoning each, and 
       body: JSON.stringify({
         model: (typeof OPENROUTER_MODEL !== "undefined" && OPENROUTER_MODEL) || "moonshotai/kimi-k3:online",
         messages: [{ role: "user", content: promptText }],
-        stream: true,
-        max_tokens: 1500
+        stream: true
       })
     });
     if(res.status === 401){
@@ -153,8 +153,10 @@ TAM, SAM and SOM as bullets with rough numbers, one line of reasoning each, and 
         const payload = line.replace(/^data:\s*/, "").trim();
         if(!line.startsWith("data:") || payload === "[DONE]") continue;
         try{
-          const delta = JSON.parse(payload).choices?.[0]?.delta?.content;
-          if(delta) streamedText += delta;
+          const d = JSON.parse(payload).choices?.[0]?.delta;
+          if(d?.content) streamedText += d.content;
+          // reasoning models think before answering — show that phase
+          else if(d?.reasoning || d?.reasoning_content) phase = "Reading results & thinking";
         }catch(e){ /* keep-alive or partial line */ }
       }
       if(streamedText && feasIdeaId === idea.id) setBody(mdToHtml(streamedText));
