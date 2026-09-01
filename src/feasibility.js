@@ -77,11 +77,27 @@ function closeModal(){
   feasIdeaId = null;
 }
 
+const setBody = html => { document.getElementById("feasBody").innerHTML = html; };
+
 async function runCheck(idea){
   const key = getKey();
   if(!key) return;
   feasIdeaId = idea.id;
-  openModal(idea, "Researching with web search — this can take a minute…");
+  openModal(idea, "Researching with web search…");
+
+  /* show elapsed time until the first tokens arrive, and abort if the
+     connection stalls — so a dead request never hangs forever */
+  const started = Date.now();
+  let streamedText = "";
+  let lastData = Date.now();
+  const ctrl = new AbortController();
+  const ticker = setInterval(()=>{
+    const secs = Math.round((Date.now() - started) / 1000);
+    if(!streamedText && feasIdeaId === idea.id){
+      setBody("<p>Researching with web search — " + secs + "s…<br>(the search itself can take 1-2 minutes)</p>");
+    }
+    if(Date.now() - lastData > 90000) ctrl.abort();
+  }, 1000);
 
   const promptText =
 `You are a pragmatic startup analyst. Do a quick feasibility check on this idea:
@@ -103,29 +119,60 @@ TAM, SAM and SOM as bullets with rough numbers, one line of reasoning each, and 
   try{
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
+      signal: ctrl.signal,
       headers: { "Authorization": "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: (typeof OPENROUTER_MODEL !== "undefined" && OPENROUTER_MODEL) || "moonshotai/kimi-k3:online",
-        messages: [{ role: "user", content: promptText }]
+        messages: [{ role: "user", content: promptText }],
+        stream: true,
+        max_tokens: 1500
       })
     });
     if(res.status === 401){
       try{ window.localStorage.removeItem("openrouter-key"); }catch(e){}
       throw new Error("invalid API key — it was cleared, click 📈 to enter it again");
     }
-    if(!res.ok) throw new Error("OpenRouter answered " + res.status);
-    const data = await res.json();
-    const text = data.choices?.[0]?.message?.content;
-    if(!text) throw new Error("empty response");
+    if(!res.ok){
+      let msg = "OpenRouter answered " + res.status;
+      try{ msg += " — " + (JSON.parse(await res.text()).error?.message || ""); }catch(e){}
+      throw new Error(msg);
+    }
+
+    /* stream the answer into the modal as it is written */
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = "";
+    for(;;){
+      const { done, value } = await reader.read();
+      if(done) break;
+      lastData = Date.now();
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split("\n");
+      buf = lines.pop();
+      for(const line of lines){
+        const payload = line.replace(/^data:\s*/, "").trim();
+        if(!line.startsWith("data:") || payload === "[DONE]") continue;
+        try{
+          const delta = JSON.parse(payload).choices?.[0]?.delta?.content;
+          if(delta) streamedText += delta;
+        }catch(e){ /* keep-alive or partial line */ }
+      }
+      if(streamedText && feasIdeaId === idea.id) setBody(mdToHtml(streamedText));
+    }
+    if(!streamedText.trim()) throw new Error("empty response");
 
     const target = state.ideas.find(i=>i.id===idea.id);
     if(target){
-      target.feasibility = { text: text.trim(), ts: Date.now() };
+      target.feasibility = { text: streamedText.trim(), ts: Date.now() };
       touched(); render();
       if(feasIdeaId === idea.id) openModal(target);
     }
   }catch(err){
-    if(feasIdeaId === idea.id) openModal(idea, "Check failed: " + err.message);
+    console.error("feasibility check failed", err);
+    const msg = err.name === "AbortError" ? "timed out — no data from OpenRouter for 90s" : err.message;
+    if(feasIdeaId === idea.id) openModal(idea, "Check failed: " + msg);
+  }finally{
+    clearInterval(ticker);
   }
 }
 
