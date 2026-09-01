@@ -41,6 +41,15 @@ Database page if it's not in the snippet.)
 
 Commit, push, send the GitHub Pages link to your friends. Done.
 
+## Run locally
+
+The app uses ES modules, which browsers refuse to load from `file://`
+pages — so don't open index.html directly. Serve the folder instead:
+
+    python3 -m http.server 8000
+
+then open http://localhost:8000.
+
 ## Notes
 - Without the Firebase config the app still works, but nothing is
   saved — use Export JSON to keep a copy. The badge in the header
