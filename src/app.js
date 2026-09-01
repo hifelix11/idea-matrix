@@ -444,14 +444,42 @@
     return k;
   }
 
+  /* minimal markdown -> HTML: headings, bullets, bold, clickable links */
+  function mdToHtml(md){
+    let h = esc(md);
+    h = h.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+      '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    // bare URLs become links labeled with their hostname
+    h = h.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, (m, pre, url)=>{
+      let label = "source";
+      try{ label = new URL(url).hostname.replace(/^www\./, ""); }catch(e){}
+      return pre + '<a href="' + url + '" target="_blank" rel="noopener">' + label + "</a>";
+    });
+    h = h.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+    let out = "", inList = false;
+    h.split("\n").forEach(line=>{
+      const l = line.trim();
+      const isHead = /^#{1,4}\s+/.test(l) || /^[A-Z][A-Z0-9 .&/-]{3,}$/.test(l);
+      if(inList && !/^[-*•]\s+/.test(l)){ out += "</ul>"; inList = false; }
+      if(isHead) out += "<h4>" + l.replace(/^#{1,4}\s+/, "") + "</h4>";
+      else if(/^[-*•]\s+/.test(l)){
+        if(!inList){ out += "<ul>"; inList = true; }
+        out += "<li>" + l.replace(/^[-*•]\s+/, "") + "</li>";
+      }
+      else if(l !== "") out += "<p>" + l + "</p>";
+    });
+    if(inList) out += "</ul>";
+    return out;
+  }
+
   function openFeasModal(idea, status){
     document.getElementById("feasTitle").textContent = idea.name;
     const body = document.getElementById("feasBody");
     if(status){
       body.textContent = status;
     }else if(idea.feasibility){
-      body.textContent = idea.feasibility.text +
-        "\n\n— checked " + new Date(idea.feasibility.ts).toLocaleDateString();
+      body.innerHTML = mdToHtml(idea.feasibility.text) +
+        '<p class="feas-date">— checked ' + new Date(idea.feasibility.ts).toLocaleDateString() + "</p>";
     }else{
       body.textContent = "No check yet.";
     }
@@ -482,15 +510,15 @@
 Idea: ${idea.name}
 ${idea.desc ? "Description: " + idea.desc : ""}
 
-Use web search to ground your answer in real, current data. Reply in plain text (no markdown syntax) with exactly these sections:
+Use web search to ground your answer in real, current data. Reply in simple markdown: "##" for section headings, "-" for bullet points, **bold** for key numbers, and cite sources as inline markdown links like [Source name](https://…) — never paste bare URLs. Use exactly these sections:
 
-MARKET SIZE
-TAM, SAM and SOM with rough numbers and one line of reasoning each.
+## Market size
+TAM, SAM and SOM as bullets with rough numbers, one line of reasoning each, and a source link.
 
-SIMILAR COMPANIES
-5-8 companies or products that already do something similar: name — what they do — how this idea could differ.
+## Similar companies
+5-8 companies or products that already do something similar: **name** (linked to their site) — what they do — how this idea could differ.
 
-VERDICT
+## Verdict
 2-3 sentences on overall feasibility and the single biggest risk.`;
 
     try{
