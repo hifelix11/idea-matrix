@@ -347,12 +347,14 @@
       }
 
       row.innerHTML = `
-        <span class="swatch" style="background:${ideaColor(idea.id)}"></span>
-        <span class="name" title="Double-click to edit">${esc(idea.name)}${idea.desc ? `<span class="desc">${esc(idea.desc)}</span>` : ""}</span>
-        ${actionHtml}
-        <button class="idea-feas ${idea.feasibility?'done':''}" title="${idea.feasibility?'Show feasibility check':'Run AI feasibility check'}">📈</button>
-        <button class="idea-edit" title="Edit idea">✎</button>
-        <button class="idea-del" title="Delete idea">✕</button>`;
+        <div class="idea-top">
+          <span class="swatch" style="background:${ideaColor(idea.id)}"></span>
+          ${actionHtml}
+          <button class="idea-feas ${idea.feasibility?'done':''}" title="${idea.feasibility?'Show feasibility check':'Run AI feasibility check'}">📈</button>
+          <button class="idea-edit" title="Edit idea">✎</button>
+          <button class="idea-del" title="Delete idea">✕</button>
+        </div>
+        <span class="name" title="Double-click to edit">${esc(idea.name)}${idea.desc ? `<span class="desc">${esc(idea.desc)}</span>` : ""}</span>`;
 
       const act = row.querySelector(".idea-act");
       if(act){
