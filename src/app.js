@@ -349,10 +349,10 @@
       row.innerHTML = `
         <div class="idea-top">
           <span class="swatch" style="background:${ideaColor(idea.id)}"></span>
-          ${actionHtml}
           <button class="idea-feas ${idea.feasibility?'done':''}" title="${idea.feasibility?'Show feasibility check':'Run AI feasibility check'}">📈</button>
           <button class="idea-edit" title="Edit idea">✎</button>
           <button class="idea-del" title="Delete idea">✕</button>
+          ${actionHtml}
         </div>
         <span class="name" title="Double-click to edit">${esc(idea.name)}${idea.desc ? `<span class="desc">${esc(idea.desc)}</span>` : ""}</span>`;
 

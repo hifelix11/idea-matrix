@@ -145,12 +145,12 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:16p
 }
 .idea-top{display:flex;align-items:center;gap:11px;}
 .idea-row:hover{background:var(--cream);}
-.idea-row .swatch{width:16px;height:16px;border-radius:50%;flex:none;border:2px solid var(--paper);box-shadow:0 0 0 1.5px var(--line);}
+.idea-row .swatch{width:30px;height:12px;border-radius:999px;flex:none;}
 .idea-row .name{font-weight:600;font-size:15px;min-width:0;overflow-wrap:anywhere;}
 .idea-row .name .desc{display:block;font-size:12px;font-weight:500;color:#8a8f7d;white-space:pre-line;}
-/* stat / place button push themselves (and the icons) to the right */
-.idea-row .stat{font-size:11px;font-weight:700;color:#9aa08c;flex:none;margin-left:auto;}
-.idea-act{margin-left:auto;}
+/* icons sit right of the swatch; rated stat / place button at the far right */
+.idea-top .idea-feas{margin-left:auto;}
+.idea-row .stat{font-size:11px;font-weight:700;color:#9aa08c;flex:none;}
 .idea-act{
   width:30px;height:30px;flex:none;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
