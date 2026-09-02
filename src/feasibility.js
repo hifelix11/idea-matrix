@@ -18,7 +18,7 @@ export function showFeasibility(idea){
   }
 }
 
-function getKey(){
+export function getKey(){
   let k = null;
   try{ k = window.localStorage.getItem("openrouter-key"); }catch(e){}
   if(!k){

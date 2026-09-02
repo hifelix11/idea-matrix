@@ -50,6 +50,8 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:16p
 .tab.active{background:var(--forest);border-color:var(--forest);color:var(--lime);}
 .tab.everyone.active{background:var(--lilac);border-color:var(--lilac);color:var(--ink);}
 .tab.add{border-style:dashed;color:#7a7f6e;font-weight:600;}
+.tab:disabled{opacity:.6;cursor:default;}
+.tab:disabled:hover{transform:none;}
 .tab .x{margin-left:8px;opacity:.45;font-weight:400;}
 .tab .x:hover{opacity:1;}
 

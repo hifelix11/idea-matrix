@@ -3,6 +3,7 @@
 import { uid, esc, arrows } from "./helpers.js";
 import { state, touched } from "./store.js";
 import { view, render } from "./view.js";
+import { runAiRating, aiStatus } from "./ai.js";
 
 export function renderTabs(){
   const el = document.getElementById("tabs");
@@ -51,4 +52,11 @@ export function renderTabs(){
     }
   };
   el.appendChild(add);
+
+  const ai = document.createElement("button");
+  ai.className = "tab add";
+  ai.textContent = aiStatus() || (state.people.some(p=>p.isAI) ? "↻ Re-rate AI" : "+ Add AI");
+  ai.disabled = !!aiStatus();
+  ai.onclick = runAiRating;
+  el.appendChild(ai);
 }
