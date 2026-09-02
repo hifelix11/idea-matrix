@@ -15,6 +15,8 @@ export let state = {
 const PALETTE = ["#7B61FF","#FF6B4A","#00A876","#E84C8B","#1F8FFF","#F5A800","#254F1A","#8A4FFF","#00B8C4","#C0392B"];
 
 export const person = id => state.people.find(p=>p.id===id);
+/* people included in Everyone's matrix (eye toggle on the tabs) */
+export const visiblePeople = () => state.people.filter(p=>!p.hidden);
 export const getPl = pid => (state.placements[pid] = state.placements[pid] || {});
 export const ideaColor = id => PALETTE[ Math.max(0, state.ideas.findIndex(i=>i.id===id)) % PALETTE.length ];
 

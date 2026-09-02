@@ -17,8 +17,9 @@ export function renderTabs(){
 
   state.people.forEach(p=>{
     const t = document.createElement("button");
-    t.className = "tab" + (view.currentTab===p.id ? " active" : "");
-    t.innerHTML = esc(p.name) + (state.people.length>1 ? '<span class="x" title="Remove person">×</span>' : "");
+    t.className = "tab" + (view.currentTab===p.id ? " active" : "") + (p.hidden ? " ghost" : "");
+    t.innerHTML = esc(p.name)
+      + (state.people.length>1 ? '<span class="x" title="Remove person">×</span>' : "");
     t.onclick = e=>{
       if(e.target.classList.contains("x")){
         if(confirm(`Remove ${p.name} and their dots?`)){
@@ -54,7 +55,7 @@ export function renderTabs(){
   el.appendChild(add);
 
   const ai = document.createElement("button");
-  ai.className = "tab add";
+  ai.className = "tab add ai";
   ai.textContent = aiStatus() || (state.people.some(p=>p.isAI) ? "↻ Re-rate AI" : "+ Add AI");
   ai.disabled = !!aiStatus();
   ai.onclick = runAiRating;

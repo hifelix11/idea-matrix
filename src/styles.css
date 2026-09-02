@@ -50,10 +50,14 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:16p
 .tab.active{background:var(--forest);border-color:var(--forest);color:var(--lime);}
 .tab.everyone.active{background:var(--lilac);border-color:var(--lilac);color:var(--ink);}
 .tab.add{border-style:dashed;color:#7a7f6e;font-weight:600;}
+/* like "+ Add person", just with a hint of lilac */
+.tab.ai{border-color:var(--lilac);color:#937fc9;}
+.tab.ai:hover{border-color:#937fc9;}
 .tab:disabled{opacity:.6;cursor:default;}
 .tab:disabled:hover{transform:none;}
 .tab .x{margin-left:8px;opacity:.45;font-weight:400;}
 .tab .x:hover{opacity:1;}
+.tab.ghost{opacity:.55;}
 
 /* ---------- layout ---------- */
 .board{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:26px;align-items:start;}
@@ -70,6 +74,11 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:16p
   padding:2px 2px;min-width:60px;
 }
 .matrix-hint{font-size:13px;color:#8a8f7d;}
+
+/* include/exclude a person from Everyone's matrix */
+.eye-toggle{display:inline-flex;align-items:center;align-self:center;color:#9aa08c;padding:4px;border-radius:8px;}
+.eye-toggle:hover{color:var(--forest);}
+.eye-toggle.off{color:#c0765f;}
 
 .view-toggle{display:inline-flex;background:var(--cream);border-radius:999px;padding:4px;gap:2px;margin-left:auto;}
 .view-toggle button{padding:7px 16px;border-radius:999px;font-size:13px;font-weight:700;color:#6d7261;}

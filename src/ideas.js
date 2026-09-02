@@ -1,7 +1,7 @@
 /* the idea list and its add/edit form */
 
 import { uid, esc, arrows } from "./helpers.js";
-import { state, getPl, ideaColor, touched } from "./store.js";
+import { state, visiblePeople, getPl, ideaColor, touched } from "./store.js";
 import { view, render } from "./view.js";
 import { showFeasibility } from "./feasibility.js";
 
@@ -26,8 +26,9 @@ export function renderIdeas(){
 
   /* order: not on this matrix -> placed, not fully rated -> fully rated, then A-Z */
   const pl = view.currentTab==="everyone" ? null : getPl(view.currentTab);
-  const rated = idea => state.people.filter(p=>(state.placements[p.id]||{})[idea.id]).length;
-  const fullyRated = idea => state.people.length>0 && rated(idea)===state.people.length ? 1 : 0;
+  const people = visiblePeople();
+  const rated = idea => people.filter(p=>(state.placements[p.id]||{})[idea.id]).length;
+  const fullyRated = idea => people.length>0 && rated(idea)===people.length ? 1 : 0;
   const sorted = state.ideas.slice().sort((a,b)=>{
     if(pl && !!pl[a.id] !== !!pl[b.id]) return pl[a.id] ? 1 : -1;
     if(fullyRated(a) !== fullyRated(b)) return fullyRated(a) - fullyRated(b);
@@ -42,7 +43,7 @@ function ideaRow(idea, ratedCount){
   row.className = "idea-row";
 
   const actionHtml = view.currentTab==="everyone"
-    ? `<span class="stat">${ratedCount}/${state.people.length} rated</span>`
+    ? `<span class="stat">${ratedCount}/${visiblePeople().length} rated</span>`
     : (pl => `<button class="idea-act ${pl?'placed':''}" title="${pl?'Remove from matrix':'Place in the middle of the matrix'}">${pl?'✓':'+'}</button>`)(!!getPl(view.currentTab)[idea.id]);
 
   row.innerHTML = `
