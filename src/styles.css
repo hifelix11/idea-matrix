@@ -252,6 +252,8 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:16p
   .axis-y{left:0;top:50%;}
   .axis-x{bottom:0;left:50%;transform:translate(-50%,50%);}
 
+  /* left-align the whole header row on small screens */
   .matrix-head{margin-bottom:12px;padding-left:0;}
+  .view-toggle,.matrix-hint{margin-left:0;}
   .view-toggle button{padding:5px 12px;font-size:12px;}
 }
