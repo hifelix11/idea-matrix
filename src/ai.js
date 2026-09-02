@@ -34,9 +34,10 @@ export async function runAiRating(){
   render();
 
   try{
-    const ratings = await fetchRatings(key);
+    const { summary, ratings } = await fetchRatings(key);
     const p = existing || { id: uid(), name: AI_NAME, isAI: true };
     if(!existing) state.people.push(p);
+    p.aiNote = summary;
     const pl = getPl(p.id);
     const clamp = v => Math.min(0.97, Math.max(0.03, Number(v)));
     ratings.forEach(r=>{
@@ -83,8 +84,8 @@ Spread the scores across the whole range so ideas are clearly separated — avoi
 Ideas:
 ${ideasBlock}
 
-Reply with ONLY a JSON array, no markdown fences, one entry per idea:
-[{"id":"<idea id>","hype":0.72,"payoff":0.35}]`;
+Reply with ONLY JSON, no markdown fences, in exactly this shape (one ratings entry per idea):
+{"summary":"1-2 sentences explaining how you weighed the ideas and what separated the top from the bottom","ratings":[{"id":"<idea id>","hype":0.72,"payoff":0.35}]}`;
 
   // no web search here — the research is already in the prompt
   const model = ((typeof OPENROUTER_MODEL !== "undefined" && OPENROUTER_MODEL) || "moonshotai/kimi-k3").replace(":online", "");
@@ -109,10 +110,17 @@ Reply with ONLY a JSON array, no markdown fences, one entry per idea:
     }
     const data = await res.json();
     const text = data.choices?.[0]?.message?.content || "";
-    const json = text.slice(text.indexOf("["), text.lastIndexOf("]") + 1);
-    const ratings = JSON.parse(json);
+    let summary = "", ratings = null;
+    try{
+      const parsed = JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1));
+      summary = typeof parsed.summary === "string" ? parsed.summary.trim() : "";
+      ratings = parsed.ratings;
+    }catch(e){
+      // fall back to a bare array, in case the model skipped the wrapper
+      ratings = JSON.parse(text.slice(text.indexOf("["), text.lastIndexOf("]") + 1));
+    }
     if(!Array.isArray(ratings) || !ratings.length) throw new Error("no ratings in the response");
-    return ratings;
+    return { summary, ratings };
   }catch(err){
     if(err.name === "AbortError") throw new Error("timed out after 3 minutes");
     throw err;

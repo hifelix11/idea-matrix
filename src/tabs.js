@@ -17,7 +17,7 @@ export function renderTabs(){
 
   state.people.forEach(p=>{
     const t = document.createElement("button");
-    t.className = "tab" + (view.currentTab===p.id ? " active" : "") + (p.hidden ? " ghost" : "");
+    t.className = "tab" + (view.currentTab===p.id ? " active" : "") + (p.hidden ? " ghost" : "") + (p.isAI ? " ai-person" : "");
     t.innerHTML = esc(p.name)
       + (state.people.length>1 ? '<span class="x" title="Remove person">×</span>' : "");
     t.onclick = e=>{
@@ -54,10 +54,13 @@ export function renderTabs(){
   };
   el.appendChild(add);
 
-  const ai = document.createElement("button");
-  ai.className = "tab add ai";
-  ai.textContent = aiStatus() || (state.people.some(p=>p.isAI) ? "↻ Re-rate AI" : "+ Add AI");
-  ai.disabled = !!aiStatus();
-  ai.onclick = runAiRating;
-  el.appendChild(ai);
+  // once the AI player exists, re-rating lives on its matrix instead
+  if(!state.people.some(p=>p.isAI)){
+    const ai = document.createElement("button");
+    ai.className = "tab add ai";
+    ai.textContent = aiStatus() || "+ Add AI";
+    ai.disabled = !!aiStatus();
+    ai.onclick = runAiRating;
+    el.appendChild(ai);
+  }
 }

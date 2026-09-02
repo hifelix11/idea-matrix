@@ -49,6 +49,8 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:16p
 .tab:hover{transform:translateY(-1px);}
 .tab.active{background:var(--forest);border-color:var(--forest);color:var(--lime);}
 .tab.everyone.active{background:var(--lilac);border-color:var(--lilac);color:var(--ink);}
+/* the AI player's tab keeps a lilac border in every state */
+.tab.ai-person,.tab.ai-person.active{border-color:var(--lilac);}
 .tab.add{border-style:dashed;color:#7a7f6e;font-weight:600;}
 /* like "+ Add person", just with a hint of lilac */
 .tab.ai{border-color:var(--lilac);color:#937fc9;}
@@ -71,6 +73,10 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:16p
 .matrix-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding-left:40px;}
 .matrix-hint{margin-left:auto;}
 .matrix-hint:empty{display:none;}
+.rerate{margin-left:auto;align-self:center;}
+
+/* the AI's short reasoning, shown under the header on its matrix */
+.ai-note{font-size:13px;color:#6d7261;margin:-4px 0 14px;padding-left:40px;max-width:70ch;}
 .matrix-title{
   font-weight:800;font-size:22px;letter-spacing:-0.01em;color:var(--forest);
   padding:2px 2px;min-width:60px;
@@ -131,6 +137,7 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:16p
   transition:width .1s,height .1s;
 }
 .dot:active{cursor:grabbing;}
+.dot.locked,.dot.locked:active{cursor:default;}
 .dot.small{width:26px;height:26px;font-size:9px;cursor:default;border-width:2px;opacity:.85;}
 .dot.avg{cursor:default;}
 .dot .badge{
@@ -254,6 +261,7 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:16p
 
   /* left-align the whole header row on small screens */
   .matrix-head{margin-bottom:12px;padding-left:0;}
-  .view-toggle,.matrix-hint{margin-left:0;}
+  .view-toggle,.matrix-hint,.rerate{margin-left:0;}
+  .ai-note{padding-left:0;}
   .view-toggle button{padding:5px 12px;font-size:12px;}
 }

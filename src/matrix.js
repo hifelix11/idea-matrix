@@ -3,6 +3,7 @@
 import { esc, abbrev, initials } from "./helpers.js";
 import { state, person, visiblePeople, getPl, ideaColor, touched } from "./store.js";
 import { view, render } from "./view.js";
+import { runAiRating, aiStatus } from "./ai.js";
 
 const AXES = {
   x: {
@@ -31,7 +32,11 @@ export function renderMatrix(){
   const hint = document.getElementById("matrixHint");
   const toggle = document.getElementById("viewToggle");
   const eye = document.getElementById("eyeToggle");
+  const rerate = document.getElementById("rerateBtn");
+  const note = document.getElementById("aiNote");
 
+  rerate.style.display = "none";
+  note.style.display = "none";
   if(view.currentTab==="everyone"){
     title.textContent = "Everyone's matrix";
     toggle.style.display = "inline-flex";
@@ -50,7 +55,19 @@ export function renderMatrix(){
       ? "Hidden from Everyone's matrix — click to include"
       : "Included in Everyone's matrix — click to hide";
     eye.onclick = ()=>{ p.hidden = !p.hidden; touched(); render(); };
-    hint.textContent = "drag dots to move";
+    if(p.isAI){
+      hint.textContent = "";
+      rerate.style.display = "inline-flex";
+      rerate.textContent = aiStatus() || "↻ Re-rate AI";
+      rerate.disabled = !!aiStatus();
+      rerate.onclick = runAiRating;
+      if(p.aiNote){
+        note.textContent = p.aiNote;
+        note.style.display = "block";
+      }
+    }else{
+      hint.textContent = "drag dots to move";
+    }
     renderPersonDots(m, p);
   }
 
@@ -87,8 +104,11 @@ function renderPersonDots(m, p){
   state.ideas.forEach(idea=>{
     const pos = pl[idea.id];
     if(!pos) return;
-    const d = makeDot(m, {ideaId:idea.id, text:abbrev(idea.name), label:ideaLabel(idea), pos});
-    enableDrag(d, m, p.id, idea.id);
+    const d = makeDot(m, {
+      className: p.isAI ? "locked" : "",
+      ideaId:idea.id, text:abbrev(idea.name), label:ideaLabel(idea), pos
+    });
+    if(!p.isAI) enableDrag(d, m, p.id, idea.id); // the AI's dots stay where the AI put them
   });
 }
 
