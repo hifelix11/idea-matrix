@@ -50,7 +50,7 @@ export function renderMatrix(){
       ? "Hidden from Everyone's matrix — click to include"
       : "Included in Everyone's matrix — click to hide";
     eye.onclick = ()=>{ p.hidden = !p.hidden; touched(); render(); };
-    hint.textContent = "drag dots to move · drag out to remove";
+    hint.textContent = "drag dots to move";
     renderPersonDots(m, p);
   }
 
